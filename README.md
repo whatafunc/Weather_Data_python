@@ -1,0 +1,1 @@
+will fetch the cities list, parse and operate their weather data
