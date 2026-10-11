@@ -1,5 +1,7 @@
 # Weather stats for a list of cities
 
+![Weather by Country](docs/hero.png)
+
 Fetches the current weather for a list of cities and prints per-city results
 plus aggregated stats per country.
 
