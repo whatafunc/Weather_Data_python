@@ -3,19 +3,25 @@ import sys
 import time
 import urllib.request
 from collections import defaultdict
-from dataclasses import dataclass
 
-@dataclass
+
 class WeatherData:
-    city: str
-    temp_c: float
-    country: str
+    def __init__(self, city: str, temp_c: float, country: str):
+        self.city = city
+        self.temp_c = temp_c
+        self.country = country
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, WeatherData):
+            return NotImplemented
+        return (self.city, self.temp_c, self.country) == (other.city, other.temp_c, other.country)
 
     def __str__(self) -> str:
-        return f"{self.city}, {self.country} {self.temp_c}°C"
+        return f"{self.city}, {self.country} {self.temp_c} °C"
+
 
 CITIES_URL = "https://gistpad.com/raw/vk-task-14"
+
 
 def http_get(url: str, timeout: int = 15, retries: int = 3) -> bytes:
     last_err = None
@@ -29,9 +35,11 @@ def http_get(url: str, timeout: int = 15, retries: int = 3) -> bytes:
             time.sleep(2 * (attempt + 1))
     raise last_err
 
+
 def fetch_cities(url: str = CITIES_URL) -> list[str]:
     text = http_get(url).decode("utf-8", errors="ignore")
     return [line.strip() for line in text.splitlines() if line.strip()]
+
 
 def fetch_weather(city: str) -> WeatherData:
     url = f"https://wttr.in/{urllib.request.quote(city)}?format=j1"
@@ -45,6 +53,29 @@ def fetch_weather(city: str) -> WeatherData:
         country=area.get("country", [{"value": ""}])[0]["value"],
     )
 
+
+# Grouping
+def group_by_country(results: list[WeatherData]) -> dict[str, list[float]]:
+    by_country = defaultdict(list)
+    for r in results:
+        by_country[r.country].append(r.temp_c)
+    return dict(by_country)
+
+
+# Printing
+def print_stats(by_country: dict[str, list[float]]) -> None:
+    if not by_country:
+        return
+    max_len = max(len(country) for country in by_country)
+    for country, temps in by_country.items():
+        print(
+            f"{country:{max_len}} -  {len(temps)} cities, "
+            f"avg: {sum(temps) / len(temps):.1f} °C, "
+            f"min: {min(temps):.1f} °C, "
+            f"max: {max(temps):.1f} °C"
+        )
+
+
 if __name__ == "__main__":
     cities = fetch_cities()
     results = []
@@ -55,13 +86,9 @@ if __name__ == "__main__":
             print(f"error {city}: {e}", file=sys.stderr)
         time.sleep(1)
 
-    by_country = defaultdict(list)
     for r in results:
         print(r)
-        by_country[r.country].append(r.temp_c)
 
     print("\nCountry stats:")
-    for country, temps in by_country.items():
-        print(
-            f"{country:14} -  {len(temps)} cities, avg: {sum(temps) / len(temps):.1f}°C, min: {min(temps):.1f}°C, max: {max(temps):.1f}°C"
-        )
+    by_country = group_by_country(results)
+    print_stats(by_country)

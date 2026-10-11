@@ -1,1 +1,54 @@
+# ---- Project-specific ----
 .opencode/
+.git/
+
+# ---- Python bytecode / caches ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ---- Distribution / packaging ----
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# ---- Virtual environments ----
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---- Testing / coverage ----
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+*.cover
+
+# ---- Type checkers / linters ----
+.mypy_cache/
+.dmypy.json
+.ruff_cache/
+.pytype/
+
+# ---- Editor / IDE ----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---- OS noise ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Logs / temp ----
+*.log
+*.tmp
